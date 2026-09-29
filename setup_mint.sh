@@ -31,14 +31,19 @@ curl -fsSL https://deno.land/install.sh | sudo -u $SUDO_USER sh
 # ==============================================================================
 echo "🐳 Installing Docker & Docker Compose..."
 if ! command -v docker &> /dev/null; then
-    curl -fsSL https://get.docker.com -o get-docker.sh
-    sh get-docker.sh
-    rm get-docker.sh
-    # Añadir usuario al grupo docker
+    # Fix broken apt lists from failed get-docker script
+    rm -f /etc/apt/sources.list.d/docker.list
+    apt-get update
+    
+    # Install safely from Linux Mint official repositories
+    apt-get install -y docker.io docker-compose-v2
+    systemctl enable --now docker
+    
+    # Add user to docker group
     usermod -aG docker $SUDO_USER
-    echo "✅ Docker installed. (Note: You may need to restart your terminal later for permission changes to take effect)"
+    echo "Docker installed."
 else
-    echo "✅ Docker is already installed."
+    echo "Docker is already installed."
 fi
 
 # ==============================================================================
@@ -78,6 +83,7 @@ echo "✅ n8n docker-compose.yml created in $N8N_DIR"
 echo "🧠 Setting up AI Python Environment..."
 LAB_DIR="$USER_HOME/laboratorio-ia"
 mkdir -p "$LAB_DIR"
+chown -R $SUDO_USER:$SUDO_USER "$LAB_DIR"
 sudo -u $SUDO_USER python3 -m venv "$LAB_DIR/entorno-ia"
 
 echo "📦 Installing AI libraries (Google Generative AI, PySpark, Pandas)..."
@@ -209,3 +215,5 @@ echo "2. Start n8n: cd ~/n8n-docker && docker compose up -d"
 echo "3. Open Antigravity Desktop App (Look in your Mint application menu) and Sign In to link your API/Account."
 echo "4. Run 'cloudflared tunnel --url http://localhost:5678' to expose n8n to the web."
 echo "----------------------------------------------------------------"
+
+
