@@ -156,12 +156,19 @@ for ext in "${EXTENSIONS[@]}"; do
 done
 
 # ==============================================================================
-# EXTRAS: Brave Browser
+# EXTRAS: Brave Browser & GitHub CLI
 # ==============================================================================
 echo "🦁 Installing Brave Browser..."
 curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | tee /etc/apt/sources.list.d/brave-browser-release.list
 apt update && apt install brave-browser -y
+
+echo "🐙 Installing GitHub CLI (gh)..."
+mkdir -p -m 755 /etc/apt/keyrings
+wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+apt update && apt install gh -y
 
 # ==============================================================================
 # FASE 11: Ollama (Local AI)
